@@ -4,7 +4,7 @@ Created on Sat Jan  7 16:02:33 2023
 
 @author: rebec
 """
-
+#%%
 from solve_network import *
 
 def case_selection(case):
@@ -37,12 +37,11 @@ def case_selection(case):
        solve_network_unconstrained(DE_1node, renewable_carriers = list_renewable_carriers) 
 
     if case =='co2cap':
-        co2_emissions=0.6*3066
+        co2_emissions=0.1*25211
         solve_network_co2cap(DE_1node, renewable_carriers = list_renewable_carriers,co2_emissions = co2_emissions) #list_renewable_carriers
 
     if case=='certificates':
-        renewable_Shares = pd.Series([0.75 for _ in range(len(DE_1node.snapshots))], index=DE_1node.snapshots)
-        # renewable_shares= [0.25,0.25,0.25,0.25,0.25, 0.25]
+        renewable_Shares = pd.Series([0.97 for _ in range(len(DE_1node.snapshots))], index=DE_1node.snapshots)
         solve_network_certificates(DE_1node, renewable_shares= renewable_Shares, renewable_carriers = list_renewable_carriers)
     DE_1node.generators_t.p.plot()
 

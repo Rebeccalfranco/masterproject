@@ -193,7 +193,7 @@ def solve_network_certificates(n, renewable_shares, renewable_carriers, *args, *
             n, renewable_generation + renewable_storage_units_store, ">=", demand_at_t *renewable_shares , "Generator", "production_share"
         )    
             
-    def extra_functionalities(n, snapshots,):
+    def extra_functionalities(n, snapshots):
         fix_bus_production(n, snapshots)
         storage_restriction(n,snapshots,renewable_carriers)
         storage_variables_constraints(n,snapshots,renewable_carriers)
@@ -229,7 +229,10 @@ def solve_network_certificates(n, renewable_shares, renewable_carriers, *args, *
         renewable_carriers.append('Renewable_Storage')
         
     
-    n.lopf(n.snapshots[:5], 
-            solver_name='gurobi',
-            pyomo=False, extra_functionality=extra_functionalities)
+    n.lopf(
+        n.snapshots[:6],
+        solver_name='gurobi',
+        pyomo=False,
+        extra_functionality=extra_functionalities,
+    )
 
