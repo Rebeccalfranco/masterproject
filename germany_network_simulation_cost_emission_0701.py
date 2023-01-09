@@ -7,6 +7,10 @@ Created on Sat Jan  7 15:35:54 2023
 #%%
 
 from solve_network import *
+from matplotlib import pyplot as plt
+import cartopy.crs as ccrs
+from pypsa.descriptors import get_switchable_as_dense as as_dense
+
 
 def case_selection(case):
     DE_1node = pypsa.Network("elec_s_337.nc")
@@ -27,7 +31,7 @@ def case_selection(case):
         solve_network_co2cap(DE_1node, renewable_carriers = list_renewable_carriers,co2_emissions = co2_emissions) #list_renewable_carriers
 
     if case=='certificates':
-        renewable_Shares = pd.Series([0.25 for _ in range(len(DE_1node.snapshots))], index=DE_1node.snapshots)
+        renewable_Shares = pd.Series([1 for _ in range(len(DE_1node.snapshots))], index=DE_1node.snapshots)
         solve_network_certificates(DE_1node, renewable_shares= renewable_Shares, renewable_carriers = list_renewable_carriers)
 
    
@@ -133,11 +137,24 @@ def case_selection(case):
     system_cost =DE_1node.objective/DE_1node.loads_t.p.sum().sum()    
     print("System cost [euro/MWh]", system_cost)
     
+    fig, axs = plt.subplots(
+        1,2, figsize=(20, 10), subplot_kw={"projection": ccrs.AlbersEqualArea()}
+    )
+    generators_t=DE_1node.generators_t.p.T
+    generators_t['bus']=DE_1node.generators.bus
+    generators_t['carrier']=DE_1node.generators.carrier
+    market = (
+        generators_t.groupby(['bus', 'carrier']).sum().div(2e6)
+    )
+
+    DE_1node.plot(ax=axs[1], bus_sizes=market.sum(axis=1), title="Germany Network unconstrained")
+
+    
 
 if __name__=="__main__":
     # case = 'unconstrained'
-    # case = 'co2cap'
-    case = 'certificates'
+    case = 'co2cap'
+    #case = 'certificates'
     case_selection(case)
     
     
